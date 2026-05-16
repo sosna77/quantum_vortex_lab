@@ -1,6 +1,7 @@
 import numpy as np
 from PySide6.QtWidgets import QMainWindow, QVBoxLayout, QWidget
-from PySide6.QtGui import QTransform
+from PySide6.QtGui import QTransform, QGuiApplication
+from PySide6.QtCore import Qt
 import pyqtgraph as pg
 from engine import GPEWorker
 
@@ -45,12 +46,36 @@ class MainWindow(QMainWindow):
         self.first_frame = True
         self.max_val = 1
 
+        # ==== SETUP MYSZKI ====
+        # mysz nie przesuwa wykresu
+        self.plot_widget.setMouseEnabled(x=False, y=False)
+
+        # połączenie sygnału ruchu myszy
+        self.plot_widget.scene().sigMouseMoved.connect(self.mouse_moved)
+
+
         # worker setup
         self.worker = GPEWorker()
 
         # połączenie sygnału do slotu (metody update_screen)
         self.worker.frame_ready.connect(self.update_screen)
         self.worker.start()
+
+    def mouse_moved(self, pos):
+        view_box = self.plot_widget.getViewBox()
+
+        if view_box.sceneBoundingRect().contains(pos):
+            mouse_point = view_box.mapSceneToView(pos)
+            x, y = mouse_point.x(), mouse_point.y()
+
+            # sprawdzamy czy kliknięta
+            is_pressed = bool(QGuiApplication.mouseButtons() & Qt.MouseButton.LeftButton)
+
+            self.worker.update_spoon(x, y, active=is_pressed)
+
+        else:
+            self.worker.update_spoon(0, 0, active=False)
+
 
     def update_screen(self, ksi):
         rho = np.abs(ksi.T)**2
