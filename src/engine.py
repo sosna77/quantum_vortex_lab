@@ -1,7 +1,7 @@
 import numpy as np
 from PySide6.QtCore import QThread, Signal
 from numba import njit
-from config import SimConfig
+from .config import SimConfig
 
 @njit(cache=True)
 def ITE_real_space(ksi, DT, V, g):

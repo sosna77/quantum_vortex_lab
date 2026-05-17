@@ -3,8 +3,8 @@ from PySide6.QtWidgets import QMainWindow, QHBoxLayout, QVBoxLayout, QWidget, QP
 from PySide6.QtGui import QTransform, QGuiApplication
 from PySide6.QtCore import Qt
 import pyqtgraph as pg
-from engine import GPEWorker
-from config import SimConfig
+from .engine import GPEWorker
+from .config import SimConfig
 
 class MainWindow(QMainWindow):
     def __init__(self):
